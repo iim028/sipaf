@@ -11,7 +11,7 @@
 
             {{-- SET 1 --}}
             <div class="faculty-logo">
-                <img src="{{ asset('templates/frontend/assets/img/clients/client-1.png') }}" alt="Fakultas Teknik">
+                <img src="{{ asset('templates/frontend/assets/img/logo-jurusan/logo-hmte.png') }}" alt="Fakultas Teknik">
                 {{-- <span>Fakultas Teknik</span> --}}
             </div>
 
@@ -43,7 +43,7 @@
 
             {{-- SET 2 / DUPLIKAT UNTUK MARQUEE --}}
             <div class="faculty-logo">
-                <img src="{{ asset('templates/frontend/assets/img/clients/client-1.png') }}" alt="Fakultas Teknik">
+                <img src="{{ asset('templates/frontend/assets/img/logo-jurusan/logo-hmte.png') }}" alt="Fakultas Teknik">
                 {{-- <span>Fakultas Teknik</span> --}}
             </div>
 

@@ -7,7 +7,7 @@
 
         <div style="margin-bottom: 50px; text-align: center;">
             <div class="hero-eyebrow">MONITORING PUBLIK</div>
-            <h1 style="font-size: clamp(28px, 3.5vw, 40px); margin-bottom: 14px;">Antrian Pengaduan</h1>
+            <h1 style="font-size: clamp(28px, 3.5vw, 40px); margin-bottom: 14px;">Lacak Status Pengaduan</h1>
             <p style="color: var(--ink-soft); font-size: 16px; max-width: 55ch; margin: 0 auto;">
                 Pantau proses penanganan pengaduan akademik secara transparan melalui status pengaduan berikut.
             </p>
