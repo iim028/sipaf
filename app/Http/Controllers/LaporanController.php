@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pengaduan;
 use App\Models\Jurusan;
+use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
     public function index(Request $request)
     {
+        $title = 'Laporan Pengaduan';
+
+        $tahunIni = Carbon::Now()->year;
         $user = auth()->user();
         $query = Pengaduan::with('jurusan');
 
@@ -51,7 +55,9 @@ class LaporanController extends Controller
             'totalLaporan',
             'totalProses',
             'totalDitangani',
-            'totalSelesai'
+            'totalSelesai',
+            'tahunIni',
+            'title'
         ));
     }
 }

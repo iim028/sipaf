@@ -11,29 +11,47 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $title = 'Dashboard';
 
+        $user = auth()->user();
+        $tahunIni = Carbon::now()->year;
+
+        /* Super Admin */
         if ($user->role === 'super_admin') {
-            // Statistik Global Super Admin
+
             $totalPengaduan = Pengaduan::count();
             $proses = Pengaduan::where('status', 'Proses')->count();
             $sedangDitangani = Pengaduan::where('status', 'Sedang Ditangani')->count();
             $selesai = Pengaduan::where('status', 'Selesai')->count();
-
-            // Statistik per Jurusan
             $jurusans = Jurusan::withCount('pengaduans')->get();
-            
-            // Pengaduan Terbaru
-            $pengaduanTerbaru = Pengaduan::with('jurusan')->latest()->take(5)->get();
+            $pengaduanTerbaru = Pengaduan::with('jurusan')
+                ->latest()
+                ->take(5)
+                ->get();
 
-            // Statistik per Bulan (Tahun Berjalan)
-            $tahunIni = Carbon::now()->year;
             $pengaduanPerBulan = [];
-            for ($i = 1; $i <= 12; $i++) {
-                $pengaduanPerBulan[] = Pengaduan::whereYear('created_at', $tahunIni)
-                    ->whereMonth('created_at', $i)
-                    ->count();
+
+            for ($bulan = 1; $bulan <= 12; $bulan++) {
+                $pengaduanPerBulan[] = Pengaduan::whereYear(
+                    'created_at',
+                    $tahunIni
+                )
+                ->whereMonth('created_at', $bulan)
+                ->count();
             }
+
+            $chartPengaduan = [
+                'labels' => [
+                    'Jan', 'Feb', 'Mar', 'Apr',
+                    'Mei', 'Jun', 'Jul', 'Ags',
+                    'Sep', 'Okt', 'Nov', 'Des'
+                ],
+                'data' => $pengaduanPerBulan,
+            ];
+            $chartJurusan = [
+                'labels' => $jurusans->pluck('nama_jurusan')->values(),
+                'data' => $jurusans->pluck('pengaduans_count')->values(),
+            ];
 
             return view('admin.dashboard', compact(
                 'totalPengaduan',
@@ -42,25 +60,61 @@ class DashboardController extends Controller
                 'selesai',
                 'jurusans',
                 'pengaduanTerbaru',
-                'pengaduanPerBulan'
-            ));
-        } else {
-            // Statistik Khusus Admin Jurusan (Akan disempurnakan di Step 9)
-            $jurusanId = $user->jurusan_id;
-            $totalPengaduan = Pengaduan::where('jurusan_id', $jurusanId)->count();
-            $proses = Pengaduan::where('jurusan_id', $jurusanId)->where('status', 'Proses')->count();
-            $sedangDitangani = Pengaduan::where('jurusan_id', $jurusanId)->where('status', 'Sedang Ditangani')->count();
-            $selesai = Pengaduan::where('jurusan_id', $jurusanId)->where('status', 'Selesai')->count();
-
-            $pengaduanTerbaru = Pengaduan::where('jurusan_id', $jurusanId)->with('jurusan')->latest()->take(5)->get();
-
-            return view('admin.dashboard', compact(
-                'totalPengaduan',
-                'proses',
-                'sedangDitangani',
-                'selesai',
-                'pengaduanTerbaru'
+                'pengaduanPerBulan',
+                'chartPengaduan',
+                'chartJurusan',
+                'tahunIni',
+                'title'
             ));
         }
+
+        /* Admin Jurusan */
+        $jurusanId = $user->jurusan_id;
+        $query = Pengaduan::where('jurusan_id', $jurusanId);
+        $totalPengaduan = (clone $query)->count();
+        $proses = (clone $query)
+            ->where('status', 'Proses')
+            ->count();
+        $sedangDitangani = (clone $query)
+            ->where('status', 'Sedang Ditangani')
+            ->count();
+        $selesai = (clone $query)
+            ->where('status', 'Selesai')
+            ->count();
+        $pengaduanTerbaru = (clone $query)
+            ->with('jurusan')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $pengaduanPerBulan = [];
+
+        for ($bulan = 1; $bulan <= 12; $bulan++) {
+            $pengaduanPerBulan[] = (clone $query)
+                ->whereYear('created_at', $tahunIni)
+                ->whereMonth('created_at', $bulan)
+                ->count();
+        }
+
+        $chartPengaduan = [
+            'labels' => [
+                'Jan', 'Feb', 'Mar', 'Apr',
+                'Mei', 'Jun', 'Jul', 'Ags',
+                'Sep', 'Okt', 'Nov', 'Des'
+            ],
+            'data' => $pengaduanPerBulan,
+        ];
+
+        return view('admin.dashboard', compact(
+            'totalPengaduan',
+            'proses',
+            'sedangDitangani',
+            'selesai',
+            'pengaduanTerbaru',
+            'pengaduanPerBulan',
+            'chartPengaduan',
+            'tahunIni',
+            'title'
+        ));
     }
 }

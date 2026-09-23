@@ -1,102 +1,207 @@
-@extends('layouts.public', ['title' => 'Antrian Pengaduan - SIPAF'])
+@extends('layouts.public')
 
 @section('content')
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h2 class="fw-bold mb-3"><i class="bi bi-kanban me-2"></i>Antrian Pengaduan Publik</h2>
-        <p class="text-muted">Daftar pengaduan akademik yang masuk ke fakultas beserta status penanganannya secara transparan.</p>
-        
-        <!-- Filter Form -->
-        <form method="GET" action="{{ route('pengaduan.antrian') }}" class="row g-3 bg-white p-3 rounded shadow-sm border">
-            <div class="col-md-5">
-                <input type="text" class="form-control" name="search" value="{{ request('search') }}" placeholder="Cari Kode Pengaduan (cth: ADU-20260913-0001)">
-            </div>
-            <div class="col-md-5">
-                <select name="jurusan_id" class="form-select">
-                    <option value="">-- Semua Jurusan --</option>
-                    @foreach($jurusans as $jurusan)
-                        <option value="{{ $jurusan->id }}" {{ request('jurusan_id') == $jurusan->id ? 'selected' : '' }}>
-                            {{ $jurusan->nama_jurusan }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Filter</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<!-- Kanban Columns -->
-<div class="row g-4">
-    <!-- Kolom Proses -->
-    <div class="col-lg-4">
-        <div class="kanban-col border-top border-primary border-4">
-            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-hourglass-split me-2"></i>Proses</h5>
-            <hr>
-            @forelse($proses as $item)
-                <div class="card mb-3 shadow-sm border">
-                    <div class="card-body">
-                        <span class="badge bg-primary mb-2">{{ $item->kode_pengaduan }}</span>
-                        <h6 class="fw-bold text-dark mb-1">{{ $item->jurusan->nama_jurusan }}</h6>
-                        <p class="small text-muted mb-2"><i class="bi bi-person-badge me-1"></i>Dosen: {{ $item->nama_dosen }}</p>
-                        <div class="text-end text-muted small"><i class="bi bi-calendar-event me-1"></i>{{ $item->created_at->format('d M Y') }}</div>
-                    </div>
-                </div>
-            @empty
-                <p class="text-muted small text-center py-3">Tidak ada pengaduan dalam status proses.</p>
-            @endforelse
-            <div class="mt-3">
-                {{ $proses->appends(request()->query())->links() }}
-            </div>
-        </div>
-    </div>
+<section style="padding: 76px 0 90px;">
+    <div class="wrap" style="max-width: 1200px;">
 
-    <!-- Kolom Sedang Ditangani -->
-    <div class="col-lg-4">
-        <div class="kanban-col border-top border-warning border-4">
-            <h5 class="fw-bold text-warning mb-3 text-dark"><i class="bi bi-gear-fill me-2 text-warning"></i>Sedang Ditangani</h5>
-            <hr>
-            @forelse($sedangDitangani as $item)
-                <div class="card mb-3 shadow-sm border">
-                    <div class="card-body">
-                        <span class="badge bg-warning text-dark mb-2">{{ $item->kode_pengaduan }}</span>
-                        <h6 class="fw-bold text-dark mb-1">{{ $item->jurusan->nama_jurusan }}</h6>
-                        <p class="small text-muted mb-2"><i class="bi bi-person-badge me-1"></i>Dosen: {{ $item->nama_dosen }}</p>
-                        <div class="text-end text-muted small"><i class="bi bi-calendar-event me-1"></i>{{ $item->created_at->format('d M Y') }}</div>
-                    </div>
-                </div>
-            @empty
-                <p class="text-muted small text-center py-3">Tidak ada pengaduan sedang ditangani.</p>
-            @endforelse
-            <div class="mt-3">
-                {{ $sedangDitangani->appends(request()->query())->links() }}
-            </div>
+        <div style="margin-bottom: 50px; text-align: center;">
+            <div class="hero-eyebrow">MONITORING PUBLIK</div>
+            <h1 style="font-size: clamp(28px, 3.5vw, 40px); margin-bottom: 14px;">Lacak Status Pengaduan</h1>
+            <p style="color: var(--ink-soft); font-size: 16px; max-width: 55ch; margin: 0 auto;">
+                Pantau proses penanganan pengaduan akademik secara transparan melalui status pengaduan berikut.
+            </p>
         </div>
-    </div>
 
-    <!-- Kolom Selesai -->
-    <div class="col-lg-4">
-        <div class="kanban-col border-top border-success border-4">
-            <h5 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i>Selesai</h5>
-            <hr>
-            @forelse($selesai as $item)
-                <div class="card mb-3 shadow-sm border">
-                    <div class="card-body">
-                        <span class="badge bg-success mb-2">{{ $item->kode_pengaduan }}</span>
-                        <h6 class="fw-bold text-dark mb-1">{{ $item->jurusan->nama_jurusan }}</h6>
-                        <p class="small text-muted mb-2"><i class="bi bi-person-badge me-1"></i>Dosen: {{ $item->nama_dosen }}</p>
-                        <div class="text-end text-muted small"><i class="bi bi-calendar-event me-1"></i>{{ $item->created_at->format('d M Y') }}</div>
+        <div style="margin-bottom: 50px;">
+            <form id="filter-form" method="GET" action="{{ route('pengaduan.antrian') }}">
+                <div style="background: var(--white); border: 1px solid var(--line); padding: 28px; box-shadow: 6px 6px 0 rgba(22,35,58,0.03);">
+
+                    <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 0.6fr; gap: 20px; align-items: end;">
+
+                        <div>
+                            <label for="search" style="display: block; font-family: var(--sans); font-weight: 500; font-size: 14px; color: var(--ink); margin-bottom: 8px;">
+                                Kode Pengaduan
+                            </label>
+                            <input
+                                type="text"
+                                id="search"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Contoh: ADU-20260913-0001"
+                                style="width: 100%; padding: 12px 14px; font-family: var(--sans); font-size: 14.5px; border: 1px solid var(--line); border-radius: var(--radius-doc); background: var(--paper); color: var(--ink); outline: none;"
+                            >
+                        </div>
+
+                        {{-- Jurusan --}}
+                        <div>
+                            {{-- <label for="jurusan_id" style="display: block; font-family: var(--sans); font-weight: 500; font-size: 14px; color: var(--ink); margin-bottom: 8px;">
+                                Jurusan Terkait
+                            </label>
+                            <select
+                                id="jurusan_id"
+                                name="jurusan_id"
+                                style="width: 100%; padding: 12px 14px; font-family: var(--sans); font-size: 14.5px; border: 1px solid var(--line); border-radius: var(--radius-doc); background: var(--paper); color: var(--ink); outline: none;"
+                            >
+                                <option value="">Semua Jurusan</option>
+                                @foreach($jurusans as $jurusan)
+                                    <option value="{{ $jurusan->id }}" {{ request('jurusan_id') == $jurusan->id ? 'selected' : '' }}>
+                                        {{ $jurusan->nama_jurusan }}
+                                    </option>
+                                @endforeach
+                            </select> --}}
+                        </div>
+
+                        <div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14.5px; text-align: center;">
+                                Filter Data
+                            </button>
+                        </div>
+
                     </div>
+
                 </div>
-            @empty
-                <p class="text-muted small text-center py-3">Tidak ada pengaduan selesai.</p>
-            @endforelse
-            <div class="mt-3">
-                {{ $selesai->appends(request()->query())->links() }}
-            </div>
+            </form>
         </div>
+
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start;">
+
+            {{-- PROSES --}}
+            <div class="kanban-column">
+
+                <div class="kanban-header proses">
+                    <div>
+                        <span class="status-icon"><i class="fa-solid fa-hourglass-start"></i></span>
+                        <div>
+                            <h4>Proses</h4>
+                            <span>Menunggu penanganan</span>
+                        </div>
+                    </div>
+                    <span class="status-count">{{ $prosesTotal }}</span>
+                </div>
+
+                <div class="kanban-body">
+                    @forelse($proses as $item)
+                        <div class="complaint-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <span class="complaint-code">{{ $item->kode_pengaduan }}</span>
+                                <span style="font-size: 12px; font-family: var(--mono); color: var(--gold-deep); font-weight: 600;">PROSES</span>
+                            </div>
+                            {{-- <h5 style="font-family: var(--serif); font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 12px;">
+                                {{ $item->jurusan->nama_jurusan }}
+                            </h5> --}}
+                            <div class="complaint-info">
+                                {{-- <div><strong style="color: var(--ink-faint);">Dosen:</strong> {{ $item->nama_dosen }}</div> --}}
+                                <div><strong style="color: var(--ink-faint);">Tanggal:</strong> {{ $item->created_at->format('d M Y') }}</div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            <p>Tidak ada pengaduan dalam status proses.</p>
+                        </div>
+                    @endforelse
+
+                    @if($prosesTotal > 5)
+                        <div class="more-complaints">
+                            <span>+{{ $prosesTotal - 5 }} pengaduan lainnya</span>
+                        </div>
+                    @endif
+                </div>
+
+            </div>
+
+
+            <div class="kanban-column">
+
+                <div class="kanban-header ditangani">
+                    <div>
+                        <span class="status-icon"><i class="fa-solid fa-gears"></i></span>
+                        <div>
+                            <h4>Sedang Ditangani</h4>
+                            <span>Dalam proses penindakan</span>
+                        </div>
+                    </div>
+                    <span class="status-count">{{ $sedangDitanganiTotal }}</span>
+                </div>
+
+                <div class="kanban-body">
+                    @forelse($sedangDitangani as $item)
+                        <div class="complaint-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <span class="complaint-code">{{ $item->kode_pengaduan }}</span>
+                                <span style="font-size: 12px; font-family: var(--mono); color: #B3863C; font-weight: 600;">DITANGANI</span>
+                            </div>
+                            {{-- <h5 style="font-family: var(--serif); font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 12px;">
+                                {{ $item->jurusan->nama_jurusan }}
+                            </h5> --}}
+                            <div class="complaint-info">
+                                {{-- <div><strong style="color: var(--ink-faint);">Dosen:</strong> {{ $item->nama_dosen }}</div> --}}
+                                <div><strong style="color: var(--ink-faint);">Tanggal:</strong> {{ $item->created_at->format('d M Y') }}</div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            <p>Tidak ada pengaduan sedang ditangani.</p>
+                        </div>
+                    @endforelse
+
+                    @if($sedangDitanganiTotal > 5)
+                        <div class="more-complaints">
+                            <span>+{{ $sedangDitanganiTotal - 5 }} pengaduan lainnya</span>
+                        </div>
+                    @endif
+                </div>
+
+            </div>
+
+
+            <div class="kanban-column">
+
+                <div class="kanban-header selesai">
+                    <div>
+                        <span class="status-icon">✓</span>
+                        <div>
+                            <h4>Selesai</h4>
+                            <span>Pengaduan tuntas ditangani</span>
+                        </div>
+                    </div>
+                    <span class="status-count">{{ $selesaiTotal }}</span>
+                </div>
+
+                <div class="kanban-body">
+                    @forelse($selesai as $item)
+                        <div class="complaint-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <span class="complaint-code">{{ $item->kode_pengaduan }}</span>
+                                <span style="font-size: 12px; font-family: var(--mono); color: #4B7A54; font-weight: 600;">SELESAI</span>
+                            </div>
+                            {{-- <h5 style="font-family: var(--serif); font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 12px;">
+                                {{ $item->jurusan->nama_jurusan }}
+                            </h5> --}}
+                            <div class="complaint-info">
+                                {{-- <div><strong style="color: var(--ink-faint);">Dosen:</strong> {{ $item->nama_dosen }}</div> --}}
+                                <div><strong style="color: var(--ink-faint);">Tanggal:</strong> {{ $item->created_at->format('d M Y') }}</div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            <p>Tidak ada pengaduan selesai.</p>
+                        </div>
+                    @endforelse
+
+                    @if($selesaiTotal > 5)
+                        <div class="more-complaints">
+                            <span>+{{ $selesaiTotal - 5 }} pengaduan lainnya</span>
+                        </div>
+                    @endif
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-</div>
+</section>
+
 @endsection

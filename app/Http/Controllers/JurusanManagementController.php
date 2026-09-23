@@ -9,13 +9,17 @@ class JurusanManagementController extends Controller
 {
     public function index()
     {
+        $title= 'Daftar Jurusan';
+
         $jurusans = Jurusan::withCount(['users', 'pengaduans'])->latest()->paginate(10);
-        return view('admin.jurusan.index', compact('jurusans'));
+        return view('admin.jurusan.index', compact('jurusans', 'title'));
     }
 
     public function create()
     {
-        return view('admin.jurusan.create');
+        $title= 'Tambah Jurusan';
+
+        return view('admin.jurusan.create', compact('title'));
     }
 
     public function store(Request $request)
@@ -34,8 +38,10 @@ class JurusanManagementController extends Controller
 
     public function edit($id)
     {
+        $title= 'Edit Jurusan';
+
         $jurusan = Jurusan::findOrFail($id);
-        return view('admin.jurusan.edit', compact('jurusan'));
+        return view('admin.jurusan.edit', compact('jurusan', 'title'));
     }
 
     public function update(Request $request, $id)

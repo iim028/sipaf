@@ -12,6 +12,8 @@ class AdminPengaduanController extends Controller
 {
     public function index(Request $request)
     {
+        $title = 'Daftar Pengaduan';
+
         $user = auth()->user();
         $query = Pengaduan::with('jurusan');
 
@@ -47,11 +49,13 @@ class AdminPengaduanController extends Controller
         $pengaduans = $query->latest()->paginate(10)->withQueryString();
         $jurusans = Jurusan::all();
 
-        return view('admin.pengaduan.index', compact('pengaduans', 'jurusans'));
+        return view('admin.pengaduan.index', compact('pengaduans', 'jurusans', 'title'));
     }
 
     public function show($id)
     {
+        $title = 'Detail Pengaduan';
+
         $user = auth()->user();
         $pengaduan = Pengaduan::with(['jurusan', 'histories.user'])->findOrFail($id);
 
@@ -60,39 +64,43 @@ class AdminPengaduanController extends Controller
             abort(403, 'Akses ditolak. Anda tidak berhak melihat pengaduan jurusan lain.');
         }
 
-        return view('admin.pengaduan.show', compact('pengaduan'));
+        return view('admin.pengaduan.show', compact('pengaduan', compact('title')));
     }
 
-    public function updateStatus(Request $request, $id)
+public function updateStatus(Request $request, $id)
     {
-        $request->validate([
-            'status' => ['required', 'in:Proses,Sedang Ditangani,Selesai'],
-            'catatan' => ['nullable', 'string', 'max:1000'],
-        ]);
-
         $user = auth()->user();
         $pengaduan = Pengaduan::findOrFail($id);
 
-        // PROTEKSI IDOR KETAT PADA UPDATE
         if ($user->role === 'admin' && $pengaduan->jurusan_id !== $user->jurusan_id) {
             abort(403, 'Akses ditolak. Anda tidak berhak mengubah pengaduan jurusan lain.');
         }
 
+        $request->validate([
+            'status' => [
+                'required',
+                'in:Proses,Sedang Ditangani,Selesai',
+                function ($attribute, $value, $fail) use ($pengaduan) {
+                    if ($value === $pengaduan->status) {
+                        $fail('Status baru harus berbeda dengan status saat ini.');
+                    }
+                },
+            ],
+            'catatan' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'status.required' => 'Status baru wajib dipilih.',
+            'status.in' => 'Pilihan status tidak valid.',
+        ]);
+
         $statusSebelumnya = $pengaduan->status;
         $statusBaru = $request->status;
 
-        if ($statusSebelumnya === $statusBaru && empty($request->catatan)) {
-            return back()->with('error', 'Tidak ada perubahan status atau catatan yang diberikan.');
-        }
-
         DB::beginTransaction();
         try {
-            // Update status pengaduan
             $pengaduan->update([
                 'status' => $statusBaru,
             ]);
 
-            // Catat history
             PengaduanHistory::create([
                 'pengaduan_id' => $pengaduan->id,
                 'user_id' => $user->id,
