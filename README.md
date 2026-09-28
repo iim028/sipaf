@@ -15,6 +15,13 @@ SIPAF is the official channel for submitting academic complaints—ranging from 
 
 ---
 
+## Preview
+<p align="center">
+<img src="public/templates/frontend/assets/img/preview.png" width="70%">
+</p>
+
+---
+
 ## Tech Stack
 
 - **Backend:** Laravel + Laravel Octane (FrankenPHP)
@@ -62,6 +69,11 @@ Copy the example `.env` file and generate a new application key:
 ```bash
 cp .env.example .env
 php artisan key:generate
+```
+
+**Starting AI Assistant:**
+```bash
+OPENROUTER_KEY=YOUR_API_KEY
 ```
 
 > **Note:** Adjust the database settings (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) in your `.env` file to match your local setup.
