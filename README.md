@@ -1,58 +1,120 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="https://img.shields.io/badge/Laravel-Octane-FF2D20?style=flat&logo=laravel&logoColor=white" alt="Laravel Octane">
+<img src="https://img.shields.io/badge/Server-FrankenPHP-000000?style=flat&logo=php&logoColor=white" alt="FrankenPHP">
+<img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+<img src="https://img.shields.io/badge/PHP-%3E%3D8.2-777BB4?style=flat&logo=php&logoColor=white" alt="PHP Version">
 </p>
 
-## About Laravel
+<h1 align="center">Sistem Informasi Pengaduan Fakultas — Universitas Peradaban</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+SIPAF is the official channel for submitting academic complaints—ranging from grades and faculty guidance to lecture facilities. Every report is logged, assigned a ticket number, and followed up on by the relevant unit.
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+- **Backend:** Laravel + Laravel Octane (FrankenPHP)
+- **Frontend:** Blade
+- **Database:** MySQL
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Requirements
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Before installing, make sure your environment has:
 
-## Agentic Development
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- MySQL (or another Laravel-supported database)
+- Git
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
+
+## Installation Guide
+
+Follow these steps to install the project locally or on a server.
+
+### 1. Clone the Repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone
+cd sipaf
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install Dependencies
 
-## Contributing
+Install all backend packages (Composer) and frontend assets (NPM):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+npm install
+```
 
-## Code of Conduct
+### 3. Configure the Environment
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Copy the example `.env` file and generate a new application key:
 
-## Security Vulnerabilities
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+> **Note:** Adjust the database settings (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) in your `.env` file to match your local setup.
+
+### 4. Run Migrations & Link Storage
+
+Run the database migrations and create the storage symlink (required for uploaded panorama images to be publicly accessible):
+
+```bash
+php artisan db:seed
+php artisan migrate
+php artisan storage:link
+```
+
+---
+
+## Running the Application
+
+This project uses Laravel Octane with the FrankenPHP server. Choose the mode that fits your workflow.
+
+### A. Local Development
+
+**Option 1 — Default Artisan server**
+
+```bash
+php artisan serve
+```
+
+**Option 2 — Octane with Vite (recommended for active development)**
+
+1. install lib frankenphp
+```bash
+php artisan octane:install
+```
+
+Use the included `dev.sh` script to run Vite (NPM) and the Octane server together in one command.
+
+1. Grant execute permission to the script (only needed once):
+
+```bash
+    chmod +x dev.sh
+```
+
+2. Run the script:
+
+```bash
+    ./dev.sh
+```
+
+   This script runs `npm run dev` and `php artisan octane:start --watch` in parallel, so frontend and backend changes are picked up automatically.
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is built on the [Laravel](https://laravel.com) framework, which is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
